@@ -1,480 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Software Engineer Portfolio | Antonio Martinez</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        .profile-pic {
-            transition: transform 0.5s ease;
-        }
-
-        .profile-pic:hover {
-            transform: scale(1.05);
-        }
-
-        .section {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-
-        .section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .project-card {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .social-icon {
-            transition: all 0.3s ease;
-        }
-
-        .social-icon:hover {
-            transform: scale(1.2);
-        }
-
-        .nav-link {
-            position: relative;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -2px;
-            left: 0;
-            background-color: #3b82f6;
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-left: 30px;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 8px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #3b82f6;
-        }
-
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            left: 5px;
-            top: 20px;
-            width: 2px;
-            height: calc(100% - 20px);
-            background: #e5e7eb;
-        }
-
-        .timeline-item:last-child::after {
-            display: none;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: white;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 40;
-        }
-
-        .mobile-menu.active {
-            display: block;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 0.75rem 0;
-            color: #4b5563;
-            font-size: 1.125rem;
-        }
-
-        .mobile-menu a:hover {
-            color: #1f2937;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>Antonio Martinez</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+    body {
+      font-family: 'Ubuntu Mono', monospace;
+      background-color: #000;
+      overflow: hidden;
+    }
+    .terminal {
+      border: 1px solid #00ff41;
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+    }
+    .cursor {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .matrix-text {
+      color: #00ff41;
+      text-shadow: 0 0 5px #00ff41;
+    }
+    .command-line::before {
+      content: "user@matrix:~$ ";
+      color: #00ff41;
+    }
+    .rain {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      opacity: 0.2;
+    }
+    .rain span {
+      position: absolute;
+      top: -50px;
+      animation: rain 5s linear infinite;
+      color: #00ff41;
+      font-size: 1.5em;
+      transform: rotate(90deg);
+    }
+    @keyframes rain {
+      0% { transform: translateY(0) rotate(90deg); opacity: 1; }
+      70% { opacity: 0.8; }
+      100% { transform: translateY(100vh) rotate(90deg); opacity: 0; }
+    }
+    pre.ascii-art {
+      line-height: 1;
+      color: #00ff41;
+      font-size: 0.6rem;
+    }
+  </style>
 </head>
+<body class="h-screen flex items-center justify-center p-4">
+<div class="rain" id="rain"></div>
+<div class="terminal w-full max-w-3xl h-96 bg-black rounded-lg overflow-hidden flex flex-col">
+  <div class="flex items-center bg-gray-900 p-2">
+    <div class="flex space-x-2">
+      <div class="w-3 h-3 rounded-full bg-red-500"></div>
+      <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+      <div class="w-3 h-3 rounded-full bg-green-500"></div>
+    </div>
+    <div class="text-center flex-grow text-gray-400 text-sm">user@matrix: ~</div>
+  </div>
+  <div class="flex-grow p-4 overflow-y-auto" id="terminal-content">
+    <div id="initialization-text" class="matrix-text"></div>
+  </div>
+  <div class="p-2 border-t border-gray-800 flex items-center">
+    <span class="text-green-500 mr-2">user@matrix:~$</span>
+    <input type="text" id="command-input" class="bg-transparent text-green-500 outline-none flex-grow" disabled autocomplete="off" spellcheck="false">
+  </div>
+</div>
+<script>
+function createRain() {
+  const rainContainer = document.getElementById('rain');
+  const characters = '01';
+  const columns = Math.floor(window.innerWidth / 20);
+  for (let i = 0; i < columns; i++) {
+    const span = document.createElement('span');
+    span.style.left = `${Math.random() * 100}%`;
+    span.style.animationDelay = `${Math.random() * 5}s`;
+    span.style.animationDuration = `${3 + Math.random() * 5}s`;
+    span.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+    rainContainer.appendChild(span);
+  }
+}
 
-<body class="bg-gray-50 text-gray-800">
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div class="text-xl font-semibold text-gray-900">Antonio Martinez</div>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#about" class="nav-link text-gray-600 hover:text-gray-900">About</a>
-                    <a href="#experience" class="nav-link text-gray-600 hover:text-gray-900">Experience</a>
-                    <a href="#projects" class="nav-link text-gray-600 hover:text-gray-900">Projects</a>
-                    <a href="#contact" class="nav-link text-gray-600 hover:text-gray-900">Contact</a>
-                </nav>
-                <button id="mobile-menu-button" class="md:hidden text-gray-600">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-            </div>
-            <div id="mobile-menu" class="mobile-menu md:hidden">
-                <a href="#about" class="nav-link">About</a>
-                <a href="#experience" class="nav-link">Experience</a>
-                <a href="#projects" class="nav-link">Projects</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </div>
-        </div>
-    </header>
+function typeSequence(messages, interval = 1500) {
+  const container = document.getElementById('initialization-text');
+  messages.forEach((msg, i) => {
+    setTimeout(() => {
+      const line = document.createElement('div');
+      line.className = 'text-cyan-400';
+      line.textContent = msg;
+      container.appendChild(line);
+    }, i * interval);
+  });
+  setTimeout(() => {
+    container.innerHTML += `
+      <div class="text-green-400 mt-4">Portfolio Terminal v3.1.4 - Secure Shell Access</div>
+      <div class="text-yellow-300">Type 'help' to see available commands</div>
+      <div class="command-line"></div>
+    `;
+    document.getElementById('command-input').disabled = false;
+    document.getElementById('command-input').focus();
+  }, messages.length * interval + 500);
+}
 
-    <main class="container mx-auto px-6 py-12">
-        <!-- Hero Section -->
-        <section class="flex flex-col md:flex-row items-center justify-between mb-24">
-            <div class="md:w-1/2 mb-12 md:mb-0">
-                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Antonio Martinez</h1>
-                <h2 class="text-2xl md:text-3xl font-semibold text-gray-600 mb-6">AI Software Engineer</h2>
-                <p class="text-lg text-gray-600 mb-8 leading-relaxed">
-                    AI expert with 10+ years in enterprise solutions, specializing in GenAI, computer vision, software
-                    development and technical leadership.
-                </p>
-                <div class="flex space-x-4">
-                    <a href="#contact"
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors duration-300">
-                        Contact Me
-                    </a>
-                    <a href="#projects"
-                        class="border border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-3 rounded-lg transition-colors duration-300">
-                        View Projects
-                    </a>
-                </div>
-            </div>
-            <div class="md:w-1/3 flex justify-center">
-                <div class="profile-pic w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
-                    <img src="antonio.jpg" alt="Profile Picture" class="w-full h-full object-cover">
-                </div>
-            </div>
-        </section>
+function setupCommandHandler() {
+  const terminalContent = document.getElementById('terminal-content');
+  const commandInput = document.getElementById('command-input');
 
-        <!-- About Section -->
-        <section id="about" class="section mb-24 py-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8">About Me</h2>
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
-                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
-                        Hi, I'm Antonio — an AI Software Engineer at Intel with a Master’s degree in Computer Science
-                        from Texas State University. I have over 10 years of experience in technical leadership, AI,
-                        computer vision and software development.
-                    </p>
-                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
-                        I’m passionate about building impactful technology and sharing what I learn along the way.
-                    </p>
-                    <p class="text-lg text-gray-600 leading-relaxed">
-                        Through presentations, workshops, and media content, I aim to motivate others in their journey
-                        with AI and software engineering.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Technical Skills</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-2">Languages</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Python</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Golang</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">JavaScript/TypeScript</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">C++</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">C#</span>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-2">Artificial Intelligence</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">LLM</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">RAG</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">LlamaIndex</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">LangChain</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">OpenVINO</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">PyTorch</span>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-2">Cloud & DevOps</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">GCP</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Docker</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Kubernetes</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Databases</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">CI/CD</span>
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-700 mb-2">Soft Skills</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Technial Leadership</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Communication</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Presentation</span>
-                                <span class="bg-gray-100 px-3 py-1 rounded-full text-sm">Collaboration</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+  commandInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const command = commandInput.value.trim();
+      commandInput.value = '';
 
-        <!-- Experience Section -->
-        <section id="experience" class="section mb-24 py-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-12">Professional Experience</h2>
-            <div class="space-y-8">
-                <div class="timeline-item">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">AI Senior Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">Intel - Edge Computing Group</span>
-                        </div>
-                        <div class="text-gray-500 mb-4">Jan 2020 - Present | Chandler, AZ</div>
-                        <ul class="list-disc pl-5 space-y-2 text-gray-600">
-                            <li>Led architecture design and implementation of a distributed microservices platform
-                                serving 10M+ users</li>
-                            <li>Mentored and guided a team of 15 engineers, improving code quality and development
-                                velocity by 40%</li>
-                            <li>Designed and implemented a real-time analytics pipeline reducing data processing latency
-                                from minutes to seconds</li>
-                            <li>Spearheaded the adoption of Kubernetes across the organization, reducing infrastructure
-                                costs by 35%</li>
-                        </ul>
-                    </div>
-                </div>
+      const newLine = document.createElement('div');
+      newLine.className = 'matrix-text mt-2 command-line';
+      newLine.textContent = command;
+      terminalContent.appendChild(newLine);
+      processCommand(command);
+      terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+  });
+}
 
-                <div class="timeline-item">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">Senior Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">Intel - Internet of Things Group</span>
-                        </div>
-                        <div class="text-gray-500 mb-4">Sept 2016 - Dec 2020 | Chandler, AZ</div>
-                        <ul class="list-disc pl-5 space-y-2 text-gray-600">
-                            <li>Architected and developed a scalable REST API serving as the backbone for the company's
-                                flagship product</li>
-                            <li>Implemented a comprehensive testing strategy increasing test coverage from 45% to 95%
-                            </li>
-                            <li>Optimized database queries reducing page load times by 60%</li>
-                            <li>Introduced CI/CD pipelines reducing deployment times from hours to minutes</li>
-                        </ul>
-                    </div>
-                </div>
+function processCommand(command) {
+  const terminalContent = document.getElementById('terminal-content');
+  const response = document.createElement('div');
+  response.className = 'mt-2';
 
-                <div class="timeline-item">
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">Intel - Supply Chain Group</span>
-                        </div>
-                        <div class="text-gray-500 mb-4">Sept 2014 - Sept 2016 | Chandler, AZ</div>
-                        <ul class="list-disc pl-5 space-y-2 text-gray-600">
-                            <li>Developed IoT solutions for warehouse and transportation to enhance efficiency by leveraging sensors like RFID, Bluetooth, temperature, and humidity monitoring.</li>
-                            <li>Utilized computer vision technology to automate manual tasks and warehouse operations.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+  switch(command.toLowerCase()) {
+    case 'help':
+      response.innerHTML = `
+        <div class="text-cyan-300">Available commands:</div>
+        <div class="ml-4 text-green-400">about - Information</div>
+        <div class="ml-4 text-green-400">skills - Show skills</div>
+        <div class="ml-4 text-green-400">contact - Contact info</div>
+        <div class="ml-4 text-green-400">photo - Show profile image</div>
+        <div class="ml-4 text-green-400">clear - Clear the terminal</div>`;
+      break;
+    case 'photo':
+      response.innerHTML = `
+        <pre class="ascii-art">                                     
+                               .......:-=+**##*+++=-:...............                                
+                            .......:=*######%%%%%@@%%%+:........:::....                             
+                        ........-=*##%######%%%%%%%%#%%%%*=:......::::....                          
+                     ..........-*##%%##%##%%%###########%%%%%+:..::..:::::....                      
+                  ............:*##%%#%%%%%%%#%%%###%%%%%%%%@@@%=:::::::::::::...                    
+                 ............-+#%%%%%%%%@%%%%@%%%@%%%%%%%%%%%@@@*:::::::::::::::...                 
+              ..............:*#%%%%%%%%%%%%%%%%%%@@@@%%%%%%%%%@@@-::::::::::::::::...               
+            ................:*%%%%%%###**++=+++++**####%%%%%%@@@@+::::::::::::::::::..              
+           .................-#%%%#**+===-----==--=====++*#%%%%@@@*::::::::::::::::::::..            
+          ................:#%%##*+===-----------------===+*%%%%@@+::::::::::::::::::::::.           
+        ..................-%%%%#+====-------------------===*%%%@%=:::::::::::::::::::::::.          
+       ...................-%%%#+=====-------------------====*%@@@=::::::::::::::::::::::::..        
+      ....................-%@%*======--------------------===*#%@@=::::::::::::::::::::::::::.       
+     .....................-%@%*====---------------------====*%@@%-:::::::::::::::::::::::::::.      
+    ......................:%@%*======--------------------===+%@@*:::::::::::::::::::::::::::::.     
+    ......................:#@%+==*#***###*==----=+**#*****===%@@+:::::::::::::::::::::::::::::.     
+   .......................:*@@+=++=-------==---==-------=+*==#@@=::::::::::::::::::::::::::::::..   
+   ........................=%%+====*##%*=+===--===+**#*+=====#@*::::::::::::::::::::::::::::::::..  
+ ..........................:*%==--===========--=========+=--=*%-::::::::::::::::::::::::::::::::..  
+...........................:+#=-----------===--===-----------+#=::::::::::::::::::::::::::::-::-:.  
+...........................:=#=-----------===--===----------=+*-:::::::::::::::::::::::::---:----.. 
+............................-+=----------===---===----------=*=::::::::::::::::::::::::::::::----:. 
+.........................::::+===-------====---====--------==+-::::::::::::::::::::::::::::-------..
+.........................::::-===-------==++==-====--------==-:::::::::::::::::::::::::-----------..
+..:.:................:::::::::===-----==+****+++**+=--=----==:::::::::::::::::::::----------------:.
+..::::.......:.......:::::::::===---=++*++++++++++++*++=-----:::::::::::::::::::------------------:.
+.::::::::.:::....:::::::::::::=+===-===**++====-===++===---=-:::::::::::::::----------------------:.
+.::::::::::::::::::::::::::::::+====---==+++-::-=+++==----==:::::::::::::-------------------------:.
+.::::::::::::::::::::::::::::::=+======-============--=====-:::::::::-----------------------------:.
+..:::::::::::::::::::::::::::-#%%*++========+++=+=========-:::::----------------------------------..
+..::::::::::::::::::::::::-=#%%%#**++++==========--==++++-::::------------------------------------..
+..::::::::::::::::::-=*%%%%%%%%%%*+***++======-=====++*+##=-:::----------------------------------:. 
+ .:::::::::::::-*#%%%%%%%%%%%%%%%%*=+*#*+++===-===++**+=#%%%+------------------------------------...
+...::::::-+*#%%%%%%%%%%%%%%%%%%%%%%#===+**+++++=+=+*+===++%%%%%%*+------------------------------:.  
+  .:=*#%%%%%%%%%%%%%%%%#%%%%%%%%%%%%%+====+**+++*+======*-*%%%%%%%%%+---------------------------..  
+   :#%%%%%%%%%%%%%%@@%%%%%%%%%%%%%%%%%+==--=============*+=%%%%%%%%%%%%#+----------------------:..  
+    -#%%%%%%%%%%%%%%@@%%%%#%%%%%%%%%%%#====-------====++*+:+#%%%%%%%%%%%%%%#*=----------------:..   
+     =%%%%%%%%%%%%%%%@@%%@@@%%###%%%%%%+-============++++=::##%%%%%%%%%%%%%%%%%#=-------------.     
+     .+%%%%%%%%%%%%%%%@@@%%%%%%%%%%%%%%%-:-========++++-::::-##%%%%%%%%%%%%%%%%%%#=----------..     
+      .+%%%%%%%%%%%%%%%%@%%%%%%%%%%%%#%%%-::::-====-:.....:::=#%%%%%%%%%%%%%%%%%%%#---------..      
+       .=%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%%%#-::.............::.=+#%%%%%%%%%%%%#%%%%%%#=------..       
+         :#%%%%%%%%%%%%%%%%@%%%%%%%%%%%%%%#:::::..........::.:+#%%%%%%%%%%%%##%%%%%%+----:.         
+          .*%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%%*:::::.........:...=*#%%%%%%%%%%%%##%%%%%#=--..          
+           .-#%%%%%%%%%%%%%%%%@%%%%%%%%%%%%%=:::::::..:.......:=##%%%%%%%%%%%%##%%%%#+:..           
+             .*%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%-:::::::::..:....:-=#%%%%%%%%%%%%###%%%*:.             
+              ..*%%%%%%%%%%%%#%%%@%%%%%%%%%%##-::::::::........-=##%%%%%%%%%%%###%#:..              
+                 .+%%%%%%%%%%###%%%%%%%%%%%%#%#:::::::.........:=+#%%%%#%#%%%%%#*:.                 
+                   .=%%%%%%%%%###%%%%%%%%%%%%%%#::::::....:::...-+##%%%%%#%%%#*....                 
+                     .:+%%%%%#####%%%%%%%%%%%%%%+::::::..::::...:-##%%%%%%#*-..                     
+                        .:*#%%%####%%%%%%%%%%%%%%-:::::::::::...:-*#%%%%*-.  ..                     
+                          ...:*%%#%%%%%%%%%%%%%%%#:::::::::::....:-#*-....                          
+                              ...:-+*#%%%%%%%%%%%%*::::::::::..........                             
+                                      ...:-+*******-.:::......                 
+        </pre>`;
+      break;
+    case 'about':
+      response.innerHTML = `
+        <div class="text-blue-300">Antonio Martinez</div>
+        <div class="text-gray-300 ml-2">AI Software Engineer with 10+ years in enterprise solutions, specializing in GenAI, computer vision, software development and technical leadership.</div>`;
+      break;
+    case 'skills':
+      response.innerHTML = `
+        <div class="text-yellow-300">Technical Skills:</div>
+        <ul class="ml-4 text-green-300 list-disc">
+          <li>GenAI, LLM, RAG, Agents, OpenVINO, OpenCV, PyTorch</li>
+          <li>Python, Golang, Javascript, C++, C#</li>
+          <li>Docker, Kubernetes, SQL/NoSQL, CI/CD, Cloud and Edge computing</li>
+          <li>Technical leadership, Communication, Presentation, Collaboration</li>
+        </ul>`;
+      break;
+    case 'contact':
+      response.innerHTML = `
+        <div class="text-yellow-400">Contact:</div>
+        <div class="ml-4 text-green-300">💻 GitHub: <a href="https://github.com/antoniomtz" target="__blank"> github.com/antoniomtz</a></div>
+        <div class="ml-4 text-green-300">💼 LinkedIn: <a href="https://www.linkedin.com/in/antoniomtz/" target="__blank">linkedin.com/in/antoniomtz</a></div>`;
+      break;
+    case 'clear':
+      terminalContent.innerHTML = '';
+      break;
+    case '':
+      return;
+    default:
+      response.innerHTML = `<span class="text-red-500">Unknown command:</span> <span class="text-white">${command}</span>`;
+  }
+  terminalContent.appendChild(response);
+  terminalContent.innerHTML += `<div class="command-line"></div>`;
+}
 
-        <!-- Projects Section -->
-        <section id="projects" class="section mb-24 py-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-12">Featured Projects</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Project 1 -->
-                <div class="project-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-                            alt="Project 1"
-                            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Distributed Task Queue</h3>
-                        <p class="text-gray-600 mb-4">A highly scalable distributed task queue system built with Go and
-                            Redis, processing millions of jobs daily.</p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Go</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Redis</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Kubernetes</span>
-                        </div>
-                        <a href="#" class="text-blue-600 font-medium hover:text-blue-800 inline-flex items-center">
-                            View Project <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="project-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1415&q=80"
-                            alt="Project 2"
-                            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Real-time Analytics Dashboard</h3>
-                        <p class="text-gray-600 mb-4">Interactive dashboard visualizing real-time data streams with
-                            WebSocket connections and dynamic charting.</p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">React</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Node.js</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">D3.js</span>
-                        </div>
-                        <a href="#" class="text-blue-600 font-medium hover:text-blue-800 inline-flex items-center">
-                            View Project <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Project 3 -->
-                <div class="project-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-                            alt="Project 3"
-                            class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Microservices Orchestrator</h3>
-                        <p class="text-gray-600 mb-4">A service mesh for managing and monitoring microservices
-                            communication with built-in resilience patterns.</p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Go</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">gRPC</span>
-                            <span class="bg-gray-100 px-2 py-1 rounded text-xs">Envoy</span>
-                        </div>
-                        <a href="#" class="text-blue-600 font-medium hover:text-blue-800 inline-flex items-center">
-                            View Project <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Get in Touch Section -->
-        <section id="contact" class="section py-16 bg-gray-50">
-            <div class="container mx-auto px-6 max-w-5xl">
-                <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">Get In Touch</h2>
-                <div class="flex flex-col items-center">
-                    <p class="text-xl text-gray-600 mb-12 leading-relaxed text-center max-w-2xl">
-                        I'm always interested in hearing about new opportunities, interesting projects, or just chatting
-                        about technology. Feel free to reach out through any of the channels below.
-                    </p>
-                    <h3 class="text-2xl font-semibold text-gray-900 mb-8 text-center">Connect With Me</h3>
-                    <div class="flex justify-center space-x-8">
-                        <a href="#"
-                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-all duration-300">
-                            <i class="fab fa-linkedin-in text-3xl"></i>
-                        </a>
-                        <a href="#"
-                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300">
-                            <i class="fab fa-github text-3xl"></i>
-                        </a>
-                        <a href="#"
-                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-400 transition-all duration-300">
-                            <i class="fab fa-twitter text-3xl"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-50 border-t border-gray-100 py-8">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="text-gray-600 mb-4 md:mb-0">
-                    © 2025 Antonio Martinez.
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Intersection Observer for scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.section').forEach(section => {
-            observer.observe(section);
-        });
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-
-        // Mobile menu toggle (would need implementation)
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-
-            // Toggle between burger and close icon
-            const icon = mobileMenuButton.querySelector('i');
-            if (mobileMenu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-
-        // Close mobile menu when a link is clicked
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                mobileMenuButton.querySelector('i').classList.remove('fa-times');
-                mobileMenuButton.querySelector('i').classList.add('fa-bars');
-            });
-        });
-    </script>
+window.onload = function () {
+  createRain();
+  typeSequence([
+    'Initializing Portfolio terminal v3.1.4...',
+    'Checking system integrity...',
+    'Establishing secure connection...',
+    'System ready.'
+  ]);
+  setupCommandHandler();
+};
+</script>
 </body>
-
 </html>
