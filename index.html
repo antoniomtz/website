@@ -100,6 +100,33 @@
         .timeline-item:last-child::after {
             display: none;
         }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 40;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 0.75rem 0;
+            color: #4b5563;
+            font-size: 1.125rem;
+        }
+
+        .mobile-menu a:hover {
+            color: #1f2937;
+        }
     </style>
 </head>
 
@@ -114,9 +141,15 @@
                     <a href="#projects" class="nav-link text-gray-600 hover:text-gray-900">Projects</a>
                     <a href="#contact" class="nav-link text-gray-600 hover:text-gray-900">Contact</a>
                 </nav>
-                <button class="md:hidden text-gray-600">
+                <button id="mobile-menu-button" class="md:hidden text-gray-600">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
+            </div>
+            <div id="mobile-menu" class="mobile-menu md:hidden">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </div>
         </div>
     </header>
@@ -144,7 +177,7 @@
             </div>
             <div class="md:w-1/3 flex justify-center">
                 <div class="profile-pic w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
-                    <img src="antonio.png" alt="Profile Picture" class="w-full h-full object-cover">
+                    <img src="antonio.jpg" alt="Profile Picture" class="w-full h-full object-cover">
                 </div>
             </div>
         </section>
@@ -222,10 +255,10 @@
                 <div class="timeline-item">
                     <div class="bg-white p-6 rounded-xl shadow-sm">
                         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-                            <h3 class="text-xl font-semibold text-gray-900">Principal Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">TechCorp Inc.</span>
+                            <h3 class="text-xl font-semibold text-gray-900">AI Senior Software Engineer</h3>
+                            <span class="text-blue-600 font-medium">Intel - Edge Computing Group</span>
                         </div>
-                        <div class="text-gray-500 mb-4">Jan 2020 - Present | San Francisco, CA</div>
+                        <div class="text-gray-500 mb-4">Jan 2020 - Present | Chandler, AZ</div>
                         <ul class="list-disc pl-5 space-y-2 text-gray-600">
                             <li>Led architecture design and implementation of a distributed microservices platform
                                 serving 10M+ users</li>
@@ -243,9 +276,9 @@
                     <div class="bg-white p-6 rounded-xl shadow-sm">
                         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-900">Senior Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">InnovateSoft</span>
+                            <span class="text-blue-600 font-medium">Intel - Internet of Things Group</span>
                         </div>
-                        <div class="text-gray-500 mb-4">Mar 2016 - Dec 2019 | New York, NY</div>
+                        <div class="text-gray-500 mb-4">Sept 2016 - Dec 2020 | Chandler, AZ</div>
                         <ul class="list-disc pl-5 space-y-2 text-gray-600">
                             <li>Architected and developed a scalable REST API serving as the backbone for the company's
                                 flagship product</li>
@@ -261,15 +294,12 @@
                     <div class="bg-white p-6 rounded-xl shadow-sm">
                         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
                             <h3 class="text-xl font-semibold text-gray-900">Software Engineer</h3>
-                            <span class="text-blue-600 font-medium">Digital Solutions</span>
+                            <span class="text-blue-600 font-medium">Intel - Supply Chain Group</span>
                         </div>
-                        <div class="text-gray-500 mb-4">Jul 2012 - Feb 2016 | Boston, MA</div>
+                        <div class="text-gray-500 mb-4">Sept 2014 - Sept 2016 | Chandler, AZ</div>
                         <ul class="list-disc pl-5 space-y-2 text-gray-600">
-                            <li>Developed and maintained multiple web applications using modern JavaScript frameworks
-                            </li>
-                            <li>Collaborated with cross-functional teams to deliver features on tight deadlines</li>
-                            <li>Refactored legacy codebase to improve maintainability and performance</li>
-                            <li>Contributed to open-source projects used by the development team</li>
+                            <li>Developed IoT solutions for warehouse and transportation to enhance efficiency by leveraging sensors like RFID, Bluetooth, temperature, and humidity monitoring.</li>
+                            <li>Utilized computer vision technology to automate manual tasks and warehouse operations.</li>
                         </ul>
                     </div>
                 </div>
@@ -348,71 +378,30 @@
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="section py-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8">Get In Touch</h2>
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
-                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+        <!-- Get in Touch Section -->
+        <section id="contact" class="section py-16 bg-gray-50">
+            <div class="container mx-auto px-6 max-w-5xl">
+                <h2 class="text-4xl font-bold text-gray-900 mb-8 text-center">Get In Touch</h2>
+                <div class="flex flex-col items-center">
+                    <p class="text-xl text-gray-600 mb-12 leading-relaxed text-center max-w-2xl">
                         I'm always interested in hearing about new opportunities, interesting projects, or just chatting
-                        about technology.
-                        Feel free to reach out through any of the channels below.
+                        about technology. Feel free to reach out through any of the channels below.
                     </p>
-                    <div class="space-y-4">
-                        <div class="flex items-center">
-                            <i class="fas fa-envelope text-blue-600 mr-4 text-xl"></i>
-                            <span class="text-gray-700">john.doe@example.com</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-phone text-blue-600 mr-4 text-xl"></i>
-                            <span class="text-gray-700">(123) 456-7890</span>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-map-marker-alt text-blue-600 mr-4 text-xl"></i>
-                            <span class="text-gray-700">San Francisco, CA</span>
-                        </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 mb-8 text-center">Connect With Me</h3>
+                    <div class="flex justify-center space-x-8">
+                        <a href="#"
+                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition-all duration-300">
+                            <i class="fab fa-linkedin-in text-3xl"></i>
+                        </a>
+                        <a href="#"
+                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-all duration-300">
+                            <i class="fab fa-github text-3xl"></i>
+                        </a>
+                        <a href="#"
+                            class="social-icon w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-400 transition-all duration-300">
+                            <i class="fab fa-twitter text-3xl"></i>
+                        </a>
                     </div>
-                    <div class="mt-8">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Connect With Me</h3>
-                        <div class="flex space-x-4">
-                            <a href="#"
-                                class="social-icon w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-600">
-                                <i class="fab fa-linkedin-in text-xl"></i>
-                            </a>
-                            <a href="#"
-                                class="social-icon w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 hover:text-gray-900">
-                                <i class="fab fa-github text-xl"></i>
-                            </a>
-                            <a href="#"
-                                class="social-icon w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-blue-100 hover:text-blue-400">
-                                <i class="fab fa-twitter text-xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-xl shadow-sm">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-6">Send Me a Message</h3>
-                    <form class="space-y-4">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                            <input type="text" id="name"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" id="email"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                            <textarea id="message" rows="4"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
-                        <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors duration-300">
-                            Send Message
-                        </button>
-                    </form>
                 </div>
             </div>
         </section>
@@ -422,11 +411,7 @@
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="text-gray-600 mb-4 md:mb-0">
-                    © 2023 John Doe. All rights reserved.
-                </div>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-gray-600 hover:text-gray-900">Privacy Policy</a>
-                    <a href="#" class="text-gray-600 hover:text-gray-900">Terms of Service</a>
+                    © 2025 Antonio Martinez.
                 </div>
             </div>
         </div>
@@ -464,10 +449,30 @@
         });
 
         // Mobile menu toggle (would need implementation)
-        const mobileMenuButton = document.querySelector('button.md\\:hidden');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
         mobileMenuButton.addEventListener('click', () => {
-            // Implement mobile menu toggle functionality here
-            console.log('Mobile menu clicked');
+            mobileMenu.classList.toggle('active');
+
+            // Toggle between burger and close icon
+            const icon = mobileMenuButton.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuButton.querySelector('i').classList.remove('fa-times');
+                mobileMenuButton.querySelector('i').classList.add('fa-bars');
+            });
         });
     </script>
 </body>
