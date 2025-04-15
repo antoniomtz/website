@@ -1,254 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="https://raw.githubusercontent.com/antoniomtz/website/refs/heads/main/favicon.ico" type="image/x-icon">
-  <title>Antonio Martinez</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
-    body {
-      font-family: 'Ubuntu Mono', monospace;
-      background-color: #000;
-      overflow: hidden;
-    }
-    .terminal {
-      border: 1px solid #00ff41;
-      box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-    }
-    .cursor {
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-    .matrix-text {
-      color: #00ff41;
-      text-shadow: 0 0 5px #00ff41;
-    }
-    .command-line::before {
-      content: "user@matrix:~$ ";
-      color: #00ff41;
-    }
-    .rain {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -1;
-      opacity: 0.2;
-    }
-    .rain span {
-      position: absolute;
-      top: -50px;
-      animation: rain 5s linear infinite;
-      color: #00ff41;
-      font-size: 1.5em;
-      transform: rotate(90deg);
-    }
-    @keyframes rain {
-      0% { transform: translateY(0) rotate(90deg); opacity: 1; }
-      70% { opacity: 0.8; }
-      100% { transform: translateY(100vh) rotate(90deg); opacity: 0; }
-    }
-    pre.ascii-art {
-      line-height: 1;
-      color: #00ff41;
-      font-size: 0.6rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for Matrix theme and terminal appearance */
+        body {
+            background-color: #000;
+            color: #00ff41; /* Matrix green */
+            font-family: 'Monospace', monospace;
+            overflow: hidden; /* Hide body scrollbars */
+        }
+
+        /* Canvas for Matrix background effect */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place behind terminal window */
+            opacity: 0.3; /* Make it subtle */
+        }
+
+        /* Terminal window container */
+        #terminal-window {
+            background-color: rgba(10, 10, 10, 0.85); /* Slightly transparent black */
+            backdrop-filter: blur(2px); /* Frosted glass effect */
+            border: 1px solid #00ff41; /* Matrix green border */
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); /* Green glow effect */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Clip content like terminal title bar */
+        }
+
+        /* Title bar styling */
+        #title-bar {
+            background-color: #1a1a1a; /* Darker background for title bar */
+            padding: 4px 10px;
+            border-bottom: 1px solid #00ff41; /* Separator line */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em; /* Smaller font for title */
+            user-select: none; /* Prevent text selection */
+        }
+
+         /* Fake window controls */
+        .window-controls span {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 6px;
+            background-color: grey; /* Default */
+        }
+        .window-controls .close { background-color: #ff5f57; } /* Red */
+        .window-controls .minimize { background-color: #ffbd2e; } /* Yellow */
+        .window-controls .maximize { background-color: #28c940; } /* Green */
+
+
+        /* Terminal content area styling */
+        #terminal {
+            flex-grow: 1; /* Take remaining vertical space */
+            overflow-y: auto; /* Allow scrolling within the terminal content area */
+            box-sizing: border-box;
+            font-size: 1em; /* Adjusted font size for Monospace */
+            line-height: 1.5; /* Adjusted line height */
+        }
+
+        /* Input line styling */
+        #input-line {
+            display: flex;
+            align-items: center;
+            padding-bottom: 5px; /* Add some space at the bottom */
+        }
+
+        /* Terminal prompt */
+        #prompt {
+            margin-right: 8px;
+            white-space: nowrap; /* Prevent prompt from wrapping */
+        }
+
+        /* User input field */
+        #command-input {
+            background: none;
+            border: none;
+            color: #00ff41; /* Matrix green */
+            font-family: 'Monospace', monospace;
+            font-size: inherit; /* Inherit size from terminal */
+            flex-grow: 1; /* Take remaining space */
+            outline: none; /* Remove focus outline */
+            caret-color: #00ff41; /* Green input cursor (browser default) */
+        }
+
+        /* Blinking cursor effect CSS removed */
+        /* #cursor { ... } */
+        /* @keyframes blink { ... } */
+
+        /* Custom scrollbar for terminal content area */
+        #terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+        #terminal::-webkit-scrollbar-track {
+            background: #111; /* Dark track */
+            border-radius: 0 0 4px 0; /* Match window corner if needed */
+        }
+        #terminal::-webkit-scrollbar-thumb {
+            background: #00ff41; /* Green thumb */
+            border-radius: 4px;
+        }
+        #terminal::-webkit-scrollbar-thumb:hover {
+            background: #00cc34; /* Brighter green on hover */
+        }
+
+        /* Output line styling */
+        .output-line {
+            word-wrap: break-word; /* Wrap long lines */
+            padding: 0 15px; /* Add horizontal padding to output lines */
+        }
+        /* Add top padding to the first line */
+        .output-line:first-child {
+             padding-top: 15px;
+        }
+        /* Add padding to the input line container */
+        #input-line {
+             padding-left: 15px;
+             padding-right: 15px;
+        }
+
+
+        /* Command output specific style */
+        .command-output {
+            margin-bottom: 10px; /* Space between command outputs */
+        }
+    </style>
 </head>
-<body class="h-screen flex items-center justify-center p-4">
-<div class="rain" id="rain"></div>
-<div class="terminal w-full max-w-5xl h-[32rem] bg-black rounded-lg overflow-hidden flex flex-col">
-  <div class="flex items-center bg-gray-900 p-2">
-    <div class="flex space-x-2">
-      <div class="w-3 h-3 rounded-full bg-red-500"></div>
-      <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-      <div class="w-3 h-3 rounded-full bg-green-500"></div>
+<body class="bg-black text-green-400 flex items-center justify-center min-h-screen p-4">
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="terminal-window" class="w-full max-w-4xl h-[75vh] rounded-lg">
+        <div id="title-bar">
+            <div class="window-controls">
+                <span class="close"></span>
+                <span class="minimize"></span>
+                <span class="maximize"></span>
+            </div>
+            <span>user@portfolio - Terminal</span>
+             <div class="w-16"></div> </div>
+
+        <div id="terminal">
+            <div id="output">
+                </div>
+            <div id="input-line" class="mt-2">
+                <span id="prompt">user@portfolio:~$</span>
+                <input type="text" id="command-input" autocomplete="off" autofocus>
+                </div>
+        </div>
     </div>
-    <div class="text-center flex-grow text-gray-400 text-sm">user@matrix: ~</div>
-  </div>
-  <div class="flex-grow p-4 overflow-y-auto" id="terminal-content">
-    <div id="initialization-text" class="matrix-text"></div>
-  </div>
-  <div class="p-2 border-t border-gray-800 flex items-center">
-    <span class="text-green-500 mr-2">user@matrix:~$</span>
-    <input type="text" id="command-input" class="bg-transparent text-green-500 outline-none flex-grow" disabled autocomplete="off" spellcheck="false">
-  </div>
-</div>
-<script>
-function createRain() {
-  const rainContainer = document.getElementById('rain');
-  const characters = '01';
-  const columns = Math.floor(window.innerWidth / 20);
-  for (let i = 0; i < columns; i++) {
-    const span = document.createElement('span');
-    span.style.left = `${Math.random() * 100}%`;
-    span.style.animationDelay = `${Math.random() * 5}s`;
-    span.style.animationDuration = `${3 + Math.random() * 5}s`;
-    span.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
-    rainContainer.appendChild(span);
-  }
-}
 
-function typeSequence(messages, interval = 1500) {
-  const container = document.getElementById('initialization-text');
-  messages.forEach((msg, i) => {
-    setTimeout(() => {
-      const line = document.createElement('div');
-      line.className = 'text-cyan-400';
-      line.textContent = msg;
-      container.appendChild(line);
-    }, i * interval);
-  });
-  setTimeout(() => {
-    container.innerHTML += `
-      <div class="text-green-400 mt-4">Portfolio Terminal v3.1.4 - Secure Shell Access</div>
-      <div class="text-yellow-300">Type 'help' to see available commands</div>
-      <div class="command-line"></div>
-    `;
-    document.getElementById('command-input').disabled = false;
-    document.getElementById('command-input').focus();
-  }, messages.length * interval + 500);
-}
+    <script>
+        // Get DOM elements
+        const terminalWindow = document.getElementById('terminal-window');
+        const terminal = document.getElementById('terminal');
+        const output = document.getElementById('output');
+        const inputLine = document.getElementById('input-line');
+        const commandInput = document.getElementById('command-input');
+        const promptElement = document.getElementById('prompt');
 
-function setupCommandHandler() {
-  const terminalContent = document.getElementById('terminal-content');
-  const commandInput = document.getElementById('command-input');
+        // --- Matrix Background Effect ---
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
 
-  commandInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const command = commandInput.value.trim();
-      commandInput.value = '';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-      const newLine = document.createElement('div');
-      newLine.className = 'matrix-text mt-2 command-line';
-      newLine.textContent = command;
-      terminalContent.appendChild(newLine);
-      processCommand(command);
-      terminalContent.scrollTop = terminalContent.scrollHeight;
-    }
-  });
-}
+        const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+        const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const nums = '0123456789';
+        const alphabet = katakana + latin + nums;
 
-function processCommand(command) {
-  const terminalContent = document.getElementById('terminal-content');
-  const response = document.createElement('div');
-  response.className = 'mt-2';
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize); // Use let for potential resize update
 
-  switch(command.toLowerCase()) {
-    case 'help':
-      response.innerHTML = `
-        <div class="text-cyan-300">Available commands:</div>
-        <div class="ml-4 text-green-400">about - Information</div>
-        <div class="ml-4 text-green-400">skills - Show skills</div>
-        <div class="ml-4 text-green-400">contact - Contact info</div>
-        <div class="ml-4 text-green-400">photo - Show profile image</div>
-        <div class="ml-4 text-green-400">clear - Clear the terminal</div>`;
-      break;
-    case 'photo':
-      response.innerHTML = `
-        <pre class="ascii-art">                                     
-                               .......:-=+**##*+++=-:...............                                
-                            .......:=*######%%%%%@@%%%+:........:::....                             
-                        ........-=*##%######%%%%%%%%#%%%%*=:......::::....                          
-                     ..........-*##%%##%##%%%###########%%%%%+:..::..:::::....                      
-                  ............:*##%%#%%%%%%%#%%%###%%%%%%%%@@@%=:::::::::::::...                    
-                 ............-+#%%%%%%%%@%%%%@%%%@%%%%%%%%%%%@@@*:::::::::::::::...                 
-              ..............:*#%%%%%%%%%%%%%%%%%%@@@@%%%%%%%%%@@@-::::::::::::::::...               
-            ................:*%%%%%%###**++=+++++**####%%%%%%@@@@+::::::::::::::::::..              
-           .................-#%%%#**+===-----==--=====++*#%%%%@@@*::::::::::::::::::::..            
-          ................:#%%##*+===-----------------===+*%%%%@@+::::::::::::::::::::::.           
-        ..................-%%%%#+====-------------------===*%%%@%=:::::::::::::::::::::::.          
-       ...................-%%%#+=====-------------------====*%@@@=::::::::::::::::::::::::..        
-      ....................-%@%*======--------------------===*#%@@=::::::::::::::::::::::::::.       
-     .....................-%@%*====---------------------====*%@@%-:::::::::::::::::::::::::::.      
-    ......................:%@%*======--------------------===+%@@*:::::::::::::::::::::::::::::.     
-    ......................:#@%+==*#***###*==----=+**#*****===%@@+:::::::::::::::::::::::::::::.     
-   .......................:*@@+=++=-------==---==-------=+*==#@@=::::::::::::::::::::::::::::::..   
-   ........................=%%+====*##%*=+===--===+**#*+=====#@*::::::::::::::::::::::::::::::::..  
- ..........................:*%==--===========--=========+=--=*%-::::::::::::::::::::::::::::::::..  
-...........................:+#=-----------===--===-----------+#=::::::::::::::::::::::::::::-::-:.  
-...........................:=#=-----------===--===----------=+*-:::::::::::::::::::::::::---:----.. 
-............................-+=----------===---===----------=*=::::::::::::::::::::::::::::::----:. 
-.........................::::+===-------====---====--------==+-::::::::::::::::::::::::::::-------..
-.........................::::-===-------==++==-====--------==-:::::::::::::::::::::::::-----------..
-..:.:................:::::::::===-----==+****+++**+=--=----==:::::::::::::::::::::----------------:.
-..::::.......:.......:::::::::===---=++*++++++++++++*++=-----:::::::::::::::::::------------------:.
-.::::::::.:::....:::::::::::::=+===-===**++====-===++===---=-:::::::::::::::----------------------:.
-.::::::::::::::::::::::::::::::+====---==+++-::-=+++==----==:::::::::::::-------------------------:.
-.::::::::::::::::::::::::::::::=+======-============--=====-:::::::::-----------------------------:.
-..:::::::::::::::::::::::::::-#%%*++========+++=+=========-:::::----------------------------------..
-..::::::::::::::::::::::::-=#%%%#**++++==========--==++++-::::------------------------------------..
-..::::::::::::::::::-=*%%%%%%%%%%*+***++======-=====++*+##=-:::----------------------------------:. 
- .:::::::::::::-*#%%%%%%%%%%%%%%%%*=+*#*+++===-===++**+=#%%%+------------------------------------...
-...::::::-+*#%%%%%%%%%%%%%%%%%%%%%%#===+**+++++=+=+*+===++%%%%%%*+------------------------------:.  
-  .:=*#%%%%%%%%%%%%%%%%#%%%%%%%%%%%%%+====+**+++*+======*-*%%%%%%%%%+---------------------------..  
-   :#%%%%%%%%%%%%%%@@%%%%%%%%%%%%%%%%%+==--=============*+=%%%%%%%%%%%%#+----------------------:..  
-    -#%%%%%%%%%%%%%%@@%%%%#%%%%%%%%%%%#====-------====++*+:+#%%%%%%%%%%%%%%#*=----------------:..   
-     =%%%%%%%%%%%%%%%@@%%@@@%%###%%%%%%+-============++++=::##%%%%%%%%%%%%%%%%%#=-------------.     
-     .+%%%%%%%%%%%%%%%@@@%%%%%%%%%%%%%%%-:-========++++-::::-##%%%%%%%%%%%%%%%%%%#=----------..     
-      .+%%%%%%%%%%%%%%%%@%%%%%%%%%%%%#%%%-::::-====-:.....:::=#%%%%%%%%%%%%%%%%%%%#---------..      
-       .=%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%%%#-::.............::.=+#%%%%%%%%%%%%#%%%%%%#=------..       
-         :#%%%%%%%%%%%%%%%%@%%%%%%%%%%%%%%#:::::..........::.:+#%%%%%%%%%%%%##%%%%%%+----:.         
-          .*%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%%*:::::.........:...=*#%%%%%%%%%%%%##%%%%%#=--..          
-           .-#%%%%%%%%%%%%%%%%@%%%%%%%%%%%%%=:::::::..:.......:=##%%%%%%%%%%%%##%%%%#+:..           
-             .*%%%%%%%%%%%%%%%%@@%%%%%%%%%%%%-:::::::::..:....:-=#%%%%%%%%%%%%###%%%*:.             
-              ..*%%%%%%%%%%%%#%%%@%%%%%%%%%%##-::::::::........-=##%%%%%%%%%%%###%#:..              
-                 .+%%%%%%%%%%###%%%%%%%%%%%%#%#:::::::.........:=+#%%%%#%#%%%%%#*:.                 
-                   .=%%%%%%%%%###%%%%%%%%%%%%%%#::::::....:::...-+##%%%%%#%%%#*....                 
-                     .:+%%%%%#####%%%%%%%%%%%%%%+::::::..::::...:-##%%%%%%#*-..                     
-                        .:*#%%%####%%%%%%%%%%%%%%-:::::::::::...:-*#%%%%*-.  ..                     
-                          ...:*%%#%%%%%%%%%%%%%%%#:::::::::::....:-#*-....                          
-                              ...:-+*#%%%%%%%%%%%%*::::::::::..........                             
-                                      ...:-+*******-.:::......                 
-        </pre>`;
-      break;
-    case 'about':
-      response.innerHTML = `
-        <div class="text-blue-300">Antonio Martinez</div>
-        <div class="text-gray-300 ml-2">AI Software Engineer with 10+ years in enterprise solutions, specializing in GenAI, computer vision, software development and technical leadership.</div>`;
-      break;
-    case 'skills':
-      response.innerHTML = `
-        <div class="text-yellow-300">Technical Skills:</div>
-        <ul class="ml-4 text-green-300 list-disc">
-          <li>GenAI, LLM, RAG, Agents, OpenVINO, OpenCV, PyTorch</li>
-          <li>Python, Golang, Javascript, C++, C#</li>
-          <li>Docker, Kubernetes, SQL/NoSQL, CI/CD, Cloud and Edge computing</li>
-          <li>Technical leadership, Communication, Presentation, Collaboration</li>
-        </ul>`;
-      break;
-    case 'contact':
-      response.innerHTML = `
-        <div class="text-yellow-400">Contact:</div>
-        <div class="ml-4 text-green-300">💻 GitHub: <a href="https://github.com/antoniomtz" target="__blank"> github.com/antoniomtz</a></div>
-        <div class="ml-4 text-green-300">💼 LinkedIn: <a href="https://www.linkedin.com/in/antoniomtz/" target="__blank">linkedin.com/in/antoniomtz</a></div>`;
-      break;
-    case 'clear':
-      terminalContent.innerHTML = '';
-      break;
-    case '':
-      return;
-    default:
-      response.innerHTML = `<span class="text-red-500">Unknown command:</span> <span class="text-white">${command}</span>`;
-  }
-  terminalContent.appendChild(response);
-  terminalContent.innerHTML += `<div class="command-line"></div>`;
-}
+        // Initialize drops (one per column)
+        let drops = []; // Use let for potential resize update
+        function initializeDrops() {
+            drops = [];
+            for (let x = 0; x < columns; x++) {
+                drops[x] = Math.floor(Math.random() * (canvas.height / fontSize)); // Start at random height
+            }
+        }
+        initializeDrops();
 
-window.onload = function () {
-  createRain();
-  typeSequence([
-    'Initializing Portfolio terminal v3.1.4...',
-    'Checking system integrity...',
-    'Establishing secure connection...',
-    'System ready.'
-  ]);
-  setupCommandHandler();
-};
-</script>
+        // Draw the Matrix effect
+        function drawMatrix() {
+            // Semi-transparent black background for fading effect
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41'; // Matrix green
+            // Font for matrix effect can remain different if desired, or change here too
+            ctx.font = fontSize + 'px monospace'; // Using monospace for matrix too
+
+            // Loop through drops
+            for (let i = 0; i < drops.length; i++) {
+                // Ensure drops array exists and has the element (important after resize)
+                if (drops[i] === undefined) {
+                    drops[i] = 1; // Or some default starting position
+                }
+
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                // Reset drop position randomly or when it goes off screen
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                // Increment y coordinate
+                drops[i]++;
+            }
+        }
+
+        // Start the Matrix animation loop
+        let matrixInterval = setInterval(drawMatrix, 40); // Adjust speed here
+
+        // Adjust canvas size and drops on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = Math.floor(canvas.width / fontSize); // Recalculate columns
+            initializeDrops(); // Re-initialize drops for new width/height
+        });
+
+        // --- Terminal Logic ---
+
+        const commandHistory = [];
+        let historyIndex = -1;
+
+        const bootMessages = [
+            { text: "Booting Antonio's terminal...", delay: 100, speed: 20 },
+            { text: "Initializing kernel...", delay: 500, speed: 20 },            
+            { text: "Starting Matrix background process...", delay: 300, speed: 20 },
+            { text: "System check complete. All systems nominal.", delay: 600, speed: 20 },
+            { text: "Welcome to the Portfolio Terminal!", delay: 400, speed: 20 },
+            { text: "Type 'help' to see available commands.", delay: 200, speed: 20 }
+        ];
+
+        let currentMessageIndex = 0;
+        let bootSequenceActive = true;
+
+        function typeWriter(element, text, speed, callback) {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    // Use textContent for safety against HTML injection during typing
+                    element.textContent += text.charAt(i);
+                    i++;
+                    scrollToBottom();
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    callback();
+                }
+            }
+             if (speed > 0) {
+                type();
+            } else {
+                element.textContent += text; // Display instantly
+                scrollToBottom();
+                if (callback) callback();
+            }
+        }
+
+        function runBootSequence() {
+            if (currentMessageIndex < bootMessages.length) {
+                const message = bootMessages[currentMessageIndex];
+                const lineElement = document.createElement('div');
+                lineElement.className = 'output-line'; // Apply class for padding
+                // Ensure textContent is empty before typing starts
+                lineElement.textContent = '';
+                output.appendChild(lineElement);
+
+                setTimeout(() => {
+                    typeWriter(lineElement, message.text, message.speed, () => {
+                        currentMessageIndex++;
+                        runBootSequence();
+                    });
+                }, message.delay);
+            } else {
+                bootSequenceActive = false;
+                inputLine.style.visibility = 'visible'; // Make input visible
+                commandInput.focus();
+                scrollToBottom();
+            }
+        }
+
+        function scrollToBottom() {
+            // Scroll the #terminal div, not the window
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Function to add a plain text line to the output
+        function addOutputLine(text, isCommandOutput = false) {
+            const line = document.createElement('div');
+             // Add base class and conditional class
+            line.className = 'output-line' + (isCommandOutput ? ' command-output' : '');
+            // Use textContent to prevent HTML injection from user command echo
+            line.textContent = text;
+            output.appendChild(line);
+            scrollToBottom();
+        }
+
+        // Function to add HTML content to the output (use carefully for formatted command results)
+        function addOutputHTML(htmlContent) {
+            const wrapperDiv = document.createElement('div');
+            // Add base class and command output class for styling/spacing
+            wrapperDiv.className = 'output-line command-output';
+            // Set innerHTML for the wrapper
+            wrapperDiv.innerHTML = htmlContent;
+            output.appendChild(wrapperDiv);
+            scrollToBottom();
+        }
+
+
+        function handleCommand(command) {
+            // Echo the command using addOutputLine for safety
+            addOutputLine(`${promptElement.textContent} ${command}`);
+
+            if (command.trim() !== "") {
+                commandHistory.push(command);
+                historyIndex = commandHistory.length;
+            }
+
+            const cmdLower = command.toLowerCase().trim();
+            switch (cmdLower) {
+                case 'help':
+                    // Use addOutputHTML for formatted list
+                    addOutputHTML(`Available commands:
+                        <ul class="list-disc list-inside ml-4">
+                            <li><span class="text-yellow-400">about</span>    - Display information about me</li>
+                            <li><span class="text-yellow-400">skills</span>   - List my technical skills</li>                            
+                            <li><span class="text-yellow-400">contact</span>  - Show contact information</li>                                                       
+                            <li><span class="text-yellow-400">clear</span>    - Clear the terminal screen</li>
+                            <li><span class="text-yellow-400">help</span>     - Show this help message</li>                            
+                        </ul>`);
+                    break;
+                case 'about':
+                    // --- !!! REPLACE WITH YOUR 'ABOUT' INFO !!! ---
+                    addOutputHTML(`
+                    <strong class="text-xl text-cyan-400">About Me</strong><br>
+                    ----------------------------------------<br>
+                    AI Software Engineer with 10+ years in enterprise solutions, specializing in GenAI, computer vision, software development and technical leadership.<br>
+                    `);
+                    // --- !!! REPLACE END !!! ---
+                    break;
+                case 'skills':
+                     // --- !!! REPLACE WITH YOUR SKILLS !!! ---
+                    addOutputHTML(`
+                    <strong class="text-xl text-cyan-400">Technical Skills</strong><br>
+                    ----------------------------------------<br>
+                    <ul class="list-disc list-inside ml-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4"> <li>Languages: Python, Golang, JavaScript, C++</li>
+                        <li>AI: GenAI, LLM, RAG, Agents, OpenVINO, OpenCV, PyTorch</li>
+                        <li>Databases: MongoDB, PostgreSQL, SQL</li>
+                        <li>Tools: Docker, Kubernetes, SQL/NoSQL, CI/CD, Cloud and Edge computing</li>  
+                        <li>Soft skills: Technical leadership, Communication, Presentation, Collaboration</li                      
+                        <li>Other: REST APIs, Agile Methodologies</li>
+                    </ul>
+                    `);
+                     // --- !!! REPLACE END !!! ---
+                    break;
+                 case 'contact':
+                 addOutputHTML(`
+                    <strong class="text-xl text-cyan-400">Contact</strong><br>
+                    ----------------------------------------<br>
+                    <div class="ml-4 text-green-300">💻 GitHub: <a href="https://github.com/antoniomtz" target="__blank"> github.com/antoniomtz</a></div>
+                    <div class="ml-4 text-green-300">💼 LinkedIn: <a href="https://www.linkedin.com/in/antoniomtz/" target="__blank">linkedin.com/in/antoniomtz</a></div>
+                    `);
+                    break;
+                case 'clear':
+                    output.innerHTML = ''; // Clear the output div
+                    break;
+                case 'matrix on':
+                    if (!matrixInterval) {
+                        matrixInterval = setInterval(drawMatrix, 40);
+                        canvas.style.opacity = '0.3'; // Make sure it's visible
+                        addOutputLine("Matrix background enabled.", true);
+                    } else {
+                        addOutputLine("Matrix background is already running.", true);
+                    }
+                    break;
+                case 'matrix off':
+                     if (matrixInterval) {
+                        clearInterval(matrixInterval);
+                        matrixInterval = null;
+                        // Don't clear the canvas, just hide it or stop drawing
+                        canvas.style.opacity = '0'; // Hide the canvas
+                        // Optional: Clear canvas content if you want it blank when off
+                        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        addOutputLine("Matrix background disabled.", true);
+                    } else {
+                         addOutputLine("Matrix background is already off.", true);
+                    }
+                    break;
+                 case 'matrix':
+                    addOutputLine("Usage: matrix [on|off]", true);
+                    break;
+                case '':
+                    break; // Do nothing for empty command
+                default:
+                    // Use addOutputLine for plain text error message
+                    addOutputLine(`Command not found: ${command}. Type 'help' for a list of commands.`, true);
+                    break;
+            }
+
+            commandInput.value = '';
+            scrollToBottom();
+        }
+
+        commandInput.addEventListener('keydown', function(event) {
+            if (bootSequenceActive) {
+                event.preventDefault();
+                return;
+            }
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const command = commandInput.value;
+                handleCommand(command);
+            } else if (event.key === 'ArrowUp') {
+                 event.preventDefault();
+                 if (commandHistory.length > 0 && historyIndex > 0) {
+                     historyIndex--;
+                     commandInput.value = commandHistory[historyIndex];
+                     commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length);
+                 } else if (commandHistory.length > 0 && historyIndex <= 0) {
+                     // Allow setting to the first command if index is 0 or less
+                     historyIndex = 0;
+                     commandInput.value = commandHistory[historyIndex];
+                     commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length);
+                 }
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                 if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
+                     historyIndex++;
+                     commandInput.value = commandHistory[historyIndex];
+                     commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length);
+                 } else {
+                     // If at the end or beyond, clear input and reset index
+                     historyIndex = commandHistory.length;
+                     commandInput.value = '';
+                 }
+            }
+        });
+
+        // Focus the input field when clicking inside the terminal content area
+        terminal.addEventListener('click', function(event) {
+             // Prevent focusing if clicking on scrollbar potentially
+             if (event.target === terminal && !bootSequenceActive) {
+                 commandInput.focus();
+             }
+        });
+         // Also focus when clicking the input line itself
+         inputLine.addEventListener('click', function() {
+             if (!bootSequenceActive) {
+                 commandInput.focus();
+             }
+         });
+
+
+        // --- Initialization ---
+        inputLine.style.visibility = 'hidden'; // Hide input line initially using visibility
+        runBootSequence(); // Start the boot sequence
+
+    </script>
 </body>
 </html>
